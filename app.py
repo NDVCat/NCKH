@@ -11,27 +11,28 @@ except Exception as e:
 
 app = Flask(__name__)
 
-@app.route('/predict', methods=['GET'])
+@app.route('/predict', methods=['GET', 'POST'])
 def predict():
     try:
-        data = request.get_json(force=True)
+        if request.method == 'POST':
+            data = request.get_json(force=True)
+        else:  # Nếu là GET, lấy dữ liệu từ query parameters
+            data = request.args.to_dict()
 
-        # Kiểm tra dữ liệu đầu vào có đúng định dạng không
-        if not isinstance(data, dict):
-            return jsonify({'error': 'Invalid input format, expected a JSON object'}), 400
-        
+        print("Dữ liệu nhận được:", data)  # Debugging
+
         # Chuyển đổi dữ liệu thành DataFrame
         input_data = pd.DataFrame([data])
 
         # Thực hiện dự đoán
         prediction = model.predict(input_data)
 
-        # Trả về kết quả dự đoán
-        return jsonify({'Predicted_Oilrate': float(prediction[0])})
-
+        return jsonify({'Predicted_Oilrate': prediction[0]})
     except Exception as e:
+        print("Lỗi:", str(e))  # Debugging
         return jsonify({'error': str(e)}), 400
-        
+
+
 import os
 
 if __name__ == '__main__':
