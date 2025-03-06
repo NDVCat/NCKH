@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": None,
    "id": "f51cf92a-e9d0-4190-b672-fe81d1d1a8f9",
    "metadata": {},
    "outputs": [],
@@ -12,7 +12,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": None,
    "id": "24c1a767-85e3-46eb-8426-756ccc4475f4",
    "metadata": {},
    "outputs": [],
@@ -27,7 +27,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": None,
    "id": "3d051ebc-930e-47e2-b33d-056a9f018860",
    "metadata": {},
    "outputs": [],
@@ -38,7 +38,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": None,
    "id": "9edccba9-6113-4479-a78b-b8b8817fdea2",
    "metadata": {},
    "outputs": [],
@@ -48,7 +48,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": None,
    "id": "2774e722-a004-42d1-9dba-8da558277879",
    "metadata": {},
    "outputs": [],
@@ -73,7 +73,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": None,
    "id": "5cceef5f-8482-45b5-8d75-02b790ea1c05",
    "metadata": {},
    "outputs": [],
@@ -84,7 +84,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": None,
    "id": "ace03af8-713e-4c65-91a6-574482f2305e",
    "metadata": {},
    "outputs": [],
