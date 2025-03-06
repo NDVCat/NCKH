@@ -1,10 +1,12 @@
 import joblib
 from flask import Flask, request, jsonify
 import pandas as pd
+import os
 
 # Tải mô hình đã huấn luyện
 try:
     model = joblib.load('oilrate_model.pkl')
+    print("Model loaded successfully")
 except Exception as e:
     print(f"Lỗi khi tải mô hình: {e}")
     exit(1)
@@ -22,8 +24,11 @@ def predict():
         if not data:
             return jsonify({'error': 'No input data provided'}), 400
 
-        # Chuyển đổi giá trị từ string -> float
-        data = {key: float(value) for key, value in data.items()}
+        # Kiểm tra và ép kiểu dữ liệu
+        try:
+            data = {key: float(value) for key, value in data.items() if value is not None and value != ""}
+        except ValueError:
+            return jsonify({'error': 'Invalid input format. All values must be numeric'}), 400
 
         print("Dữ liệu nhận được:", data)  # Debugging
 
@@ -38,8 +43,7 @@ def predict():
         print("Lỗi:", str(e))  # Debugging
         return jsonify({'error': str(e)}), 400
 
-import os
-
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # Render cung cấp biến PORT
+    port = int(os.environ.get("PORT", 10000))  # Render cung cấp biến PORT
+    print(f"Running on port {port}")  # Debug
     app.run(host='0.0.0.0', port=port)
