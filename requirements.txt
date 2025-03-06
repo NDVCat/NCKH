@@ -2,36 +2,16 @@
  "cells": [
   {
    "cell_type": "code",
-   "execution_count": 1,
+   "execution_count": null,
    "id": "653563fa-287d-4c64-945c-eb81859ae150",
    "metadata": {},
-   "outputs": [
-    {
-     "ename": "NameError",
-     "evalue": "name 'flask' is not defined",
-     "output_type": "error",
-     "traceback": [
-      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
-      "\u001b[1;31mNameError\u001b[0m                                 Traceback (most recent call last)",
-      "Cell \u001b[1;32mIn[1], line 1\u001b[0m\n\u001b[1;32m----> 1\u001b[0m flask\n\u001b[0;32m      2\u001b[0m numpy\n\u001b[0;32m      3\u001b[0m scikit\u001b[38;5;241m-\u001b[39mlearn\n",
-      "\u001b[1;31mNameError\u001b[0m: name 'flask' is not defined"
-     ]
-    }
-   ],
+   "outputs": [],
    "source": [
     "flask\n",
     "numpy\n",
     "scikit-learn\n",
     "gunicorn"
    ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "376d18bb-6bf0-43d0-b9c0-e5e60d9a17e3",
-   "metadata": {},
-   "outputs": [],
-   "source": []
   }
  ],
  "metadata": {
