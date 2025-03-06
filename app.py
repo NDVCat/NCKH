@@ -11,7 +11,7 @@ except Exception as e:
 
 app = Flask(__name__)
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['GET'])
 def predict():
     try:
         data = request.get_json(force=True)
