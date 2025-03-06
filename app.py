@@ -19,6 +19,12 @@ def predict():
         else:  # Nếu là GET, lấy dữ liệu từ query parameters
             data = request.args.to_dict()
 
+        if not data:
+            return jsonify({'error': 'No input data provided'}), 400
+
+        # Chuyển đổi giá trị từ string -> float
+        data = {key: float(value) for key, value in data.items()}
+
         print("Dữ liệu nhận được:", data)  # Debugging
 
         # Chuyển đổi dữ liệu thành DataFrame
@@ -31,7 +37,6 @@ def predict():
     except Exception as e:
         print("Lỗi:", str(e))  # Debugging
         return jsonify({'error': str(e)}), 400
-
 
 import os
 
