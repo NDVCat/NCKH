@@ -3,10 +3,7 @@ from flask import Flask, request, jsonify
 import pandas as pd
 import os
 
-# Giả sử bạn đã train mô hình với 5 cột: 
-# ["DayOn", "Qoil", "GOR", "Press_WH", "LiqRate"]
-# và lưu thành 'oilrate_model.pkl'
-
+# Tải mô hình đã huấn luyện
 try:
     model = joblib.load('oilrate_model.pkl')
     print("Model loaded successfully")
@@ -19,56 +16,36 @@ app = Flask(__name__)
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
     try:
-        # 1) Lấy dữ liệu
         if request.method == 'POST':
             data = request.get_json(force=True)
-        else:  # GET
+        else:  # Nếu là GET, lấy dữ liệu từ query parameters
             data = request.args.to_dict()
 
         if not data:
             return jsonify({'error': 'No input data provided'}), 400
 
-        # 2) Kiểm tra và ép kiểu cho 5 cột
-        #    Cần tất cả key ["DayOn", "Qoil", "GOR", "Press_WH", "LiqRate"].
+        # Kiểm tra và ép kiểu dữ liệu
         try:
-            # Tạo dict mới chỉ chứa 5 key cần thiết
-            required_columns = ["DayOn", "Qoil", "GOR", "Press_WH", "LiqRate"]
-            
-            # Kiểm tra thiếu cột
-            missing_cols = [col for col in required_columns if col not in data]
-            if missing_cols:
-                return jsonify({
-                    'error': f'Missing required columns: {missing_cols}'
-                }), 400
-
-            # Ép kiểu float (hoặc int) cho từng cột
-            # Nếu cột nào không parse được -> ValueError
-            input_dict = {
-                col: float(data[col]) for col in required_columns
-            }
+            data = {key: float(value) for key, value in data.items() if value is not None and value != ""}
         except ValueError:
-            return jsonify({
-                'error': 'Invalid input format. All values must be numeric'
-            }), 400
+            return jsonify({'error': 'Invalid input format. All values must be numeric'}), 400
 
-        print("Dữ liệu nhận được:", input_dict)  # Debug
+        print("Dữ liệu nhận được:", data)  # Debugging
 
-        # 3) Tạo DataFrame đúng thứ tự cột
-        input_data = pd.DataFrame([input_dict], columns=required_columns)
+        # Chuyển đổi dữ liệu thành DataFrame
+        input_data = pd.DataFrame([data])
 
-        # 4) Dự đoán
+        # Thực hiện dự đoán
         prediction = model.predict(input_data)
 
-        # 5) Trả về kết quả
-        return jsonify({'Predicted_Oilrate': float(prediction[0])})
+        # Tạo tệp Excel
+        output_file = "predictions.xlsx"
+        df.to_excel(output_file, index=False)
 
-    except Exception as e:
-        print("Lỗi:", str(e))
-        return jsonify({'error': str(e)}), 400
-
+        # Gửi tệp về client
+        return send_file(output_file, as_attachment=True, download_name="predictions.xlsx")
 
 if __name__ == '__main__':
-    # Render sẽ cung cấp biến môi trường PORT, nếu không có thì mặc định 10000
-    port = int(os.environ.get("PORT", 10000))
-    print(f"Running on port {port}")
+    port = int(os.environ.get("PORT", 10000))  # Render cung cấp biến PORT
+    print(f"Running on port {port}")  # Debug
     app.run(host='0.0.0.0', port=port)
