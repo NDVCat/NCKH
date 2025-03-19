@@ -41,11 +41,9 @@ def predict_excel():
         # Dự đoán
         df['Predicted_Oilrate'] = model.predict(df[required_fields])
 
-        # Xuất Excel với hai sheet
+        # Xuất Excel
         output_file = "predictions.xlsx"
-        with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
-            df.to_excel(writer, sheet_name="Predictions", index=False)
-            pd.DataFrame(data).to_excel(writer, sheet_name="Input Data", index=False)
+        df.to_excel(output_file, index=False)
 
         return send_file(output_file, as_attachment=True, download_name="predictions.xlsx")
 
