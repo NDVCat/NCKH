@@ -1,57 +1,56 @@
 import joblib
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify
 import pandas as pd
 import os
 
-# Tải mô hình
-if not os.path.exists('oilrate_model.pkl'):
-    print("Error: Model file not found!")
-    exit(1)
+MODEL_PATH = "oilrate_model.pkl"
 
-try:
-    model = joblib.load('oilrate_model.pkl')
-    print("Model loaded successfully")
-except Exception as e:
-    print(f"Lỗi khi tải mô hình: {e}")
-    exit(1)
+# Tải mô hình nếu tồn tại
+def load_model():
+    if not os.path.exists(MODEL_PATH):
+        print("Error: Model file not found!")
+        return None
+    try:
+        return joblib.load(MODEL_PATH)
+    except Exception as e:
+        print(f"Lỗi khi tải mô hình: {e}")
+        return None
+
+model = load_model()
 
 app = Flask(__name__)
 
-@app.route('/predict_excel', methods=['POST'])
-def predict_excel():
+@app.route('/predict', methods=['GET', 'POST'])
+def predict():
     try:
-        data = request.get_json(force=True)
-        print("Received data:", data)  # Debugging
+        if model is None:
+            return jsonify({'error': 'Model is not available'}), 500
 
-        # Nếu data là dict, chuyển thành list
-        if isinstance(data, dict):
-            data = [data]
+        data = request.get_json(silent=True) if request.method == 'POST' else request.args.to_dict()
 
-        if not isinstance(data, list):
-            return jsonify({'error': 'Input data must be a list or a dictionary'}), 400
+        if not data:
+            return jsonify({'error': 'No input data provided'}), 400
 
-        df = pd.DataFrame(data)
+        # Kiểm tra và chuyển đổi dữ liệu
+        try:
+            data = {key: float(value) for key, value in data.items()}
+        except ValueError:
+            return jsonify({'error': 'Invalid input data, must be numbers'}), 400
 
-        # Kiểm tra dữ liệu đầu vào
-        required_fields = ['DayOn', 'Qoil', 'GOR', 'Press_WH', 'LiqRate']
-        for col in required_fields:
-            if col not in df.columns:
-                return jsonify({'error': f'Missing column: {col}'}), 400
+        # Chuyển thành DataFrame và dự đoán
+        input_data = pd.DataFrame([data])
+        prediction = model.predict(input_data)
 
-        # Dự đoán
-        df['Predicted_Oilrate'] = model.predict(df[required_fields])
-
-        # Xuất Excel
-        output_file = "predictions.xlsx"
-        df.to_excel(output_file, index=False)
-
-        return send_file(output_file, as_attachment=True, download_name="predictions.xlsx")
-
+        return jsonify({'Predicted_Oilrate': float(prediction[0])})  # Định dạng kết quả hợp lệ
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
-        
+        return jsonify({'error': str(e)}), 500
+
+# Xử lý lỗi chung
+@app.errorhandler(500)
+def handle_500_error(e):
+    return jsonify({'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 10000))  # Render cung cấp biến PORT
-    print(f"Running on port {port}")  # Debug
-    app.run(host='0.0.0.0', port=port)
+    port = int(os.environ.get("PORT", 5000))  # Mặc định là 5000
+    print(f"Running on port {port}")
+    app.run(host='0.0.0.0', port=port, debug=False)
