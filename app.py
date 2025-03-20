@@ -45,6 +45,38 @@ def predict():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/predict_excel', methods=['POST'])
+def predict_excel():
+    try:
+        if model is None:
+            return jsonify({'error': 'Model is not available'}), 500
+
+        # Kiểm tra file đầu vào
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file uploaded'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+
+        # Đọc file Excel
+        df = pd.read_excel(file)
+
+        # Kiểm tra dữ liệu đầu vào
+        required_columns = ['DayOn', 'Qoil', 'GOR', 'Press_WH', 'LiqRate']
+        if not all(col in df.columns for col in required_columns):
+            return jsonify({'error': f'Missing required columns: {required_columns}'}), 400
+
+        # Dự đoán
+        predictions = model.predict(df[required_columns])
+
+        # Trả về kết quả dưới dạng JSON
+        results = df.copy()
+        results['Predicted_Oilrate'] = predictions
+        return jsonify(results.to_dict(orient="records"))
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # Xử lý lỗi chung
 @app.errorhandler(500)
 def handle_500_error(e):
